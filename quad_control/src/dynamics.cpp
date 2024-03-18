@@ -35,7 +35,7 @@ Eigen::Vector3f posicion_linear;
 
 Eigen::Matrix3f sk;
 
-Eigen::Vector3f vel_linear_loc;
+Eigen::Vector3f vel_linear_loc; //Se;or internet
 
 Eigen::Vector3f vel_linear_in;
 
