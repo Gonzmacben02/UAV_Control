@@ -8,9 +8,6 @@ float masa = 2;
 float g = 9.81;
 float step = 1.0/100.0;
 float Th = masa * g; //Thrust
-float t_roll = 0; //Torques
-float t_pitch = 0;
-float t_yaw = 0;
 float phi = 0;
 float theta = 0;
 float psi = 0;
@@ -41,9 +38,9 @@ void posControlCallBack(const geometry_msgs::Vector3::ConstPtr& thrust){
 }
 
 void angControlCallBack(const geometry_msgs::Vector3::ConstPtr& trq){
-    t_roll = trq->x;
-    t_pitch = trq->y;
-    t_yaw = trq->z;
+    torques(0) = trq->x;
+    torques(1) = trq->y;
+    torques(2) = trq->z;
 }
 
 int main(int argc, char **argv)
@@ -72,29 +69,20 @@ int main(int argc, char **argv)
         0, 0, Jzz;
 
     omega << phi, theta, psi;
-
     omega_punto << 0, 0, 0;
-
+    
     sk << 0, -w(2), w(1), 
         w(2), 0, -w(0),
         -w(1), w(0), 0;
 
     vel_linear_loc << 0, 0, 0;
-
     vel_linear_in << 0, 0, 0;
-
     vel_linear_in << 0, 0, 0;
-
     e3 << 0, 0, 1;
-
     w << 0, 0, 0;
-
     w_punto << 0, 0, 0;
-
-    torques << t_roll, t_pitch, t_yaw;
-
+    torques << 0, 0, 0;
     fuerza << 0, 0, 0;
-
     acel_linear_loc << 0, 0, 0;
 
     rotacional << cos(psi)*cos(theta), cos(psi)*sin(phi)*sin(theta) - cos(phi)*sin(psi), sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta),
@@ -127,6 +115,19 @@ int main(int argc, char **argv)
     velang_pub.publish(velang_var);
 
     while(ros::ok()){
+
+        rotacional << cos(psi)*cos(theta), cos(psi)*sin(phi)*sin(theta) - cos(phi)*sin(psi), sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta),
+                cos(theta)*sin(psi), cos(psi)*cos(phi) + sin(psi)*sin(phi)*sin(theta), cos(phi)*sin(psi)*sin(theta) - cos(psi)*sin(phi),
+                -sin(theta), cos(phi), cos(phi)*cos(theta);
+
+        r2 << 1, sin(phi)*tan(theta), cos(phi)*tan(theta),
+            0, cos(phi), -sin(phi), 
+            0, sin(phi)/cos(theta), cos(phi)/cos(theta);
+        
+        sk << 0, -w(2), w(1), 
+            w(2), 0, -w(0),
+            -w(1), w(0), 0;
+            
         //Angular
         w_punto = J.inverse()*(torques - sk * J * w);
 
@@ -139,6 +140,22 @@ int main(int argc, char **argv)
         phi = phi + step * omega_punto(0);
         theta = theta + step * omega_punto(1);
         psi = psi +step * omega_punto(2);
+
+        omega(0) = phi;
+        omega(1) = theta;
+        omega(2) = psi;
+
+        rotacional << cos(psi)*cos(theta), cos(psi)*sin(phi)*sin(theta) - cos(phi)*sin(psi), sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta),
+                cos(theta)*sin(psi), cos(psi)*cos(phi) + sin(psi)*sin(phi)*sin(theta), cos(phi)*sin(psi)*sin(theta) - cos(psi)*sin(phi),
+                -sin(theta), cos(phi), cos(phi)*cos(theta);
+
+        r2 << 1, sin(phi)*tan(theta), cos(phi)*tan(theta),
+            0, cos(phi), -sin(phi), 
+            0, sin(phi)/cos(theta), cos(phi)/cos(theta);
+        
+        sk << 0, -w(2), w(1), 
+            w(2), 0, -w(0),
+            -w(1), w(0), 0;
 
         //Lineal
         fuerza = Th * e3 + rotacional.transpose() * (masa * g * e3);
@@ -163,13 +180,13 @@ int main(int argc, char **argv)
         vel_var.y = vel_linear_in(1);
         vel_var.z = vel_linear_in(2);
 
-        ang_var.x = phi;
-        ang_var.y = theta;
-        ang_var.z = psi;
+        ang_var.x = omega(0);
+        ang_var.y = omega(1);
+        ang_var.z = omega(2);
   
-        velang_var.x = w(0);
-        velang_var.y = w(1);
-        velang_var.z = w(2);
+        velang_var.x = omega_punto(0);
+        velang_var.y = omega_punto(1);
+        velang_var.z = omega_punto(2);
 
         pos_pub.publish(pos_var);
         vel_pub.publish(vel_var);
