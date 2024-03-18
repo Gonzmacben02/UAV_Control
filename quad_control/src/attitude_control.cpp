@@ -14,7 +14,7 @@ void ang_control_function();
 void tor_function();
 
 //Definición de las variables locales generales
-float step = 0.01;
+float step = 0.01; //Step prueba
 
 double roll = 0;
 double pitch = 0;
