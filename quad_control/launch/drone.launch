@@ -1,0 +1,8 @@
+<launch>
+    
+    <node pkg="quad_control" type="dynamics_node" name="dynamics_node" />
+    <node pkg="quad_control" type="position_control_node" name="position_control_node" />
+    <node pkg="quad_control" type="attitude_control_node" name="attitude_control_node" />
+    <node pkg="quad_control" type="reference_node" name="reference_node" />
+
+</launch>
