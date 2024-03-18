@@ -102,7 +102,7 @@ int main(int argc, char** argv)
     //<$NÚMERO_DE_DATOS_A_GUARDAR_EN_CASO_DE_TERMINAR_EL_NODO>)
     ros::Publisher attitude_torq_pub = nh.advertise<geometry_msgs::Vector3>("attitudeControl", 100);
     ros::Subscriber pose_sub = nh.subscribe("posControl", 100, &posCallback);
-    ros::Subscriber yaw_sub = nh.subscribe("ref_yaw", 100, &yawCallback);
+    ros::Subscriber yaw_sub = nh.subscribe("yaw_pos", 100, &yawCallback);
     ros::Subscriber ang_sub = nh.subscribe("dynamics_ang", 100, &angCallback);
     ros::Subscriber velang_sub = nh.subscribe("dynamics_velang", 100, &velangCallback);
 

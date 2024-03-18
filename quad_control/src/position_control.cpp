@@ -127,8 +127,8 @@ int main(int argc, char **argv)
     ros::Subscriber dynamics_vel_sub = nh.subscribe("dynamics_vel", 100, &velDynCallback);
     ros::Subscriber dynamics_ang_sub = nh.subscribe("dynamics_ang", 100, &angDynCallback);
     ros::Subscriber ref_pos_sub = nh.subscribe("ref_pos", 100, &refPosCallback);
-    ros::Subscriber ref_vel_sub = nh.subscribe("ref_vel", 100, &refVelCallback);
-    ros::Subscriber ref_yaw_sub = nh.subscribe("ref_yaw", 100, &refYawCallback);
+    ros::Subscriber ref_vel_sub = nh.subscribe("vel_pos", 100, &refVelCallback);
+    ros::Subscriber ref_yaw_sub = nh.subscribe("yaw_pos", 100, &refYawCallback);
 
 
     ros::Publisher posControl_pub = nh.advertise<geometry_msgs::Vector3>("posControl", 100);
@@ -189,6 +189,12 @@ int main(int argc, char **argv)
         std::cout << "Roll deseado " << phi_roll_des << std::endl;
         std::cout << "Pitch deseado " << theta_pitch_des << std::endl;
         std::cout << "Uvz " << Uvz  << std::endl;
+        std::cout << "xd " << x_des  << std::endl;
+        std::cout << "yd " << y_des << std::endl;
+        std::cout << "zd " << z_des  << std::endl;
+        std::cout << "xdd " << x_dot_des  << std::endl;
+        std::cout << "ydd " << y_dot_des  << std::endl;
+        std::cout << "zdd " << z_dot_des  << std::endl;
         std::cout << "Thrust " << th << "\n" << std::endl;
 
         ros::spinOnce();
