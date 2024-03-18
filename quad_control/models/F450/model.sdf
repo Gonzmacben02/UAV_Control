@@ -21,7 +21,7 @@
         <pose frame=''>0 0 0 3.141592 -0 1.57075</pose>
         <geometry>
           <mesh>
-            <uri>/root/mi_ws/src/quad_control/meshes/parrot_outdoor.STL</uri>
+            <uri>/root/mi_ws/src/UAV_Control/quad_control/meshes/parrot_outdoor.STL</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -43,7 +43,7 @@
         <pose frame=''>0 0 0 3.141592 -0 1.57075</pose>
         <geometry>
           <mesh>
-            <uri>/root/mi_ws/src/quad_control/meshes/parrot_outdoor.STL</uri>
+            <uri>/root/mi_ws/src/UAV_Control/quad_control/meshes/parrot_outdoor.STL</uri>
           </mesh>
         </geometry>
         <surface>
