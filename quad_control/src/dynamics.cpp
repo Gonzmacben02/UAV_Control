@@ -6,31 +6,49 @@
 
 float masa = 2;
 float g = 9.81;
-float step = 1.0/100.0;
-float Th = masa * g; //Thrust
-float phi = 0;
-float theta = 0;
-float psi = 0;
+float step = 0.01;
+float Th = -(masa * g); //Thrust
 float Jxx = 0.0411;
 float Jyy = 0.0478;
 float Jzz = 0.0599;
 
 Eigen::Vector3f w;
 Eigen::Vector3f w_punto;
-Eigen::Vector3f omega;
-Eigen::Vector3f omega_punto;
-Eigen::Vector3f fuerza;
+Eigen::Vector3f att;
+Eigen::Vector3f att_punto;
+Eigen::Vector3f fuerza(0,0,0);
 Eigen::Vector3f acel_linear_loc;
 Eigen::Vector3f vel_linear_loc;
 Eigen::Vector3f vel_linear_in;
-Eigen::Vector3f posicion_linear (-5, 0, 0);
-
-Eigen::Matrix3f sk;
-Eigen::Vector3f e3;
-Eigen::Matrix3f J;
+Eigen::Vector3f posicion_linear;
 Eigen::Vector3f torques;
-Eigen::Matrix3f rotacional;
-Eigen::Matrix3f r2;
+
+Eigen::Vector3f e3(0,0,1);
+Eigen::Matrix3f J;
+
+Eigen::Matrix3f asimetrica(){
+    Eigen::Matrix3f sk;
+    sk << 0, -w(2), w(1), 
+        w(2), 0, -w(0),
+        -w(1), w(0), 0;
+    return sk;
+}
+
+Eigen::Matrix3f rotacional(){
+    Eigen::Matrix3f r;
+    r << cos(att(2))*cos(att(1)), cos(att(2))*sin(att(0))*sin(att(1)) - cos(att(0))*sin(att(2)), sin(att(2))*sin(att(0)) + cos(att(2))*cos(att(0))*sin(att(1)),
+        cos(att(1))*sin(att(2)), cos(att(2))*cos(att(0)) + sin(att(2))*sin(att(0))*sin(att(1)), cos(att(0))*sin(att(2))*sin(att(1)) - cos(att(2))*sin(att(0)),
+        -sin(att(1)), cos(att(1))*sin(att(0)), cos(att(0))*cos(att(1));
+    return r;
+}
+
+Eigen::Matrix3f rDos(){
+    Eigen::Matrix3f r2;
+    r2 << 1, sin(att(0))*tan(att(1)), cos(att(0))*tan(att(1)),
+            0, cos(att(0)), -sin(att(0)), 
+            0, sin(att(0))/cos(att(1)), cos(att(0))/cos(att(1));
+    return r2;
+}
 
         
 void posControlCallBack(const geometry_msgs::Vector3::ConstPtr& thrust){
@@ -68,30 +86,17 @@ int main(int argc, char **argv)
         0, Jyy, 0, 
         0, 0, Jzz;
 
-    omega << phi, theta, psi;
-    omega_punto << 0, 0, 0;
-    
-    sk << 0, -w(2), w(1), 
-        w(2), 0, -w(0),
-        -w(1), w(0), 0;
+    posicion_linear << -5, 0, 0;
+    w << 0, 0, 0;
+    w_punto << 0, 0, 0;
+    att << 0, 0, 0;
+    att_punto << 0, 0, 0;
 
     vel_linear_loc << 0, 0, 0;
     vel_linear_in << 0, 0, 0;
     vel_linear_in << 0, 0, 0;
-    e3 << 0, 0, 1;
-    w << 0, 0, 0;
-    w_punto << 0, 0, 0;
-    torques << 0, 0, 0;
-    fuerza << 0, 0, 0;
+
     acel_linear_loc << 0, 0, 0;
-
-    rotacional << cos(psi)*cos(theta), cos(psi)*sin(phi)*sin(theta) - cos(phi)*sin(psi), sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta),
-                cos(theta)*sin(psi), cos(psi)*cos(phi) + sin(psi)*sin(phi)*sin(theta), cos(phi)*sin(psi)*sin(theta) - cos(psi)*sin(phi),
-                -sin(theta), cos(phi), cos(phi)*cos(theta);
-
-    r2 << 1, sin(phi)*tan(theta), cos(phi)*tan(theta),
-            0, cos(phi), -sin(phi), 
-            0, sin(phi)/cos(theta), cos(phi)/cos(theta);
 
     pos_var.x = posicion_linear(0);
     pos_var.y = posicion_linear(1);
@@ -101,13 +106,13 @@ int main(int argc, char **argv)
     vel_var.y = vel_linear_in(1);
     vel_var.z = vel_linear_in(2);
 
-    ang_var.x = phi;
-    ang_var.y = theta;
-    ang_var.z = psi;
+    ang_var.x = att(0);
+    ang_var.y = att(1);
+    ang_var.z = att(2);
 
-    velang_var.x = w(0);
-    velang_var.y = w(1);
-    velang_var.z = w(2);
+    velang_var.x = att_punto(0);
+    velang_var.y = att_punto(1);
+    velang_var.z = att_punto(2);
 
     pos_pub.publish(pos_var);
     vel_pub.publish(vel_var);
@@ -116,57 +121,29 @@ int main(int argc, char **argv)
 
     while(ros::ok()){
 
-        rotacional << cos(psi)*cos(theta), cos(psi)*sin(phi)*sin(theta) - cos(phi)*sin(psi), sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta),
-                cos(theta)*sin(psi), cos(psi)*cos(phi) + sin(psi)*sin(phi)*sin(theta), cos(phi)*sin(psi)*sin(theta) - cos(psi)*sin(phi),
-                -sin(theta), cos(phi), cos(phi)*cos(theta);
-
-        r2 << 1, sin(phi)*tan(theta), cos(phi)*tan(theta),
-            0, cos(phi), -sin(phi), 
-            0, sin(phi)/cos(theta), cos(phi)/cos(theta);
-        
-        sk << 0, -w(2), w(1), 
-            w(2), 0, -w(0),
-            -w(1), w(0), 0;
-            
         //Angular
-        w_punto = J.inverse()*(torques - sk * J * w);
+        w_punto = J.inverse()*(torques - (asimetrica() * J * w));
 
         w(0) = w(0) + step * w_punto(0);
         w(1) = w(1) + step * w_punto(1);
         w(2) = w(2) + step * w_punto(2);
 
-        omega_punto = r2 * w;
+        att_punto = rDos() * w;
 
-        phi = phi + step * omega_punto(0);
-        theta = theta + step * omega_punto(1);
-        psi = psi +step * omega_punto(2);
-
-        omega(0) = phi;
-        omega(1) = theta;
-        omega(2) = psi;
-
-        rotacional << cos(psi)*cos(theta), cos(psi)*sin(phi)*sin(theta) - cos(phi)*sin(psi), sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta),
-                cos(theta)*sin(psi), cos(psi)*cos(phi) + sin(psi)*sin(phi)*sin(theta), cos(phi)*sin(psi)*sin(theta) - cos(psi)*sin(phi),
-                -sin(theta), cos(phi), cos(phi)*cos(theta);
-
-        r2 << 1, sin(phi)*tan(theta), cos(phi)*tan(theta),
-            0, cos(phi), -sin(phi), 
-            0, sin(phi)/cos(theta), cos(phi)/cos(theta);
-        
-        sk << 0, -w(2), w(1), 
-            w(2), 0, -w(0),
-            -w(1), w(0), 0;
+        att(0) = att(0) + step * att_punto(0);
+        att(1) = att(1) + step * att_punto(1);
+        att(2) = att(2) + step * att_punto(2);
 
         //Lineal
-        fuerza = Th * e3 + rotacional.transpose() * (masa * g * e3);
+        fuerza = (Th * e3) + (rotacional().transpose() * (masa * g * e3));
         
-        acel_linear_loc = fuerza/masa - sk * vel_linear_loc;
+        acel_linear_loc = fuerza/masa - asimetrica() * vel_linear_loc;
 
         vel_linear_loc(0) = vel_linear_loc(0) + step * acel_linear_loc(0);
         vel_linear_loc(1) = vel_linear_loc(1) + step * acel_linear_loc(1);
         vel_linear_loc(2) = vel_linear_loc(2) + step * acel_linear_loc(2);
 
-        vel_linear_in = rotacional.inverse() * vel_linear_loc;
+        vel_linear_in = rotacional() * vel_linear_loc;
 
         posicion_linear(0) = posicion_linear(0) + step * vel_linear_in(0);
         posicion_linear(1) = posicion_linear(1) + step * vel_linear_in(1);
@@ -180,13 +157,13 @@ int main(int argc, char **argv)
         vel_var.y = vel_linear_in(1);
         vel_var.z = vel_linear_in(2);
 
-        ang_var.x = omega(0);
-        ang_var.y = omega(1);
-        ang_var.z = omega(2);
-  
-        velang_var.x = omega_punto(0);
-        velang_var.y = omega_punto(1);
-        velang_var.z = omega_punto(2);
+        ang_var.x = att(0);
+        ang_var.y = att(1);
+        ang_var.z = att(2);
+
+        velang_var.x = att_punto(0);
+        velang_var.y = att_punto(1);
+        velang_var.z = att_punto(2);
 
         pos_pub.publish(pos_var);
         vel_pub.publish(vel_var);
