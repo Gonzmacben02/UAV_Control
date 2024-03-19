@@ -81,14 +81,14 @@ void angCallback(const geometry_msgs::Vector3::ConstPtr& c) //Viene del Nodo UAV
 {
     roll = c->x;
     pitch = c->y;
-    yaw = c->y;
+    yaw = c->z;
 }
 
 void velangCallback(const geometry_msgs::Vector3::ConstPtr& c) //Viene del Nodo UAV 
 {
     roll_vel = c->x;
     pitch_vel = c->y;
-    yaw_vel = c->y;
+    yaw_vel = c->z;
 }
 
 
