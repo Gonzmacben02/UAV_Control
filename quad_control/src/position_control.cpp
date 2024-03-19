@@ -41,9 +41,9 @@ float contador = 0.0;
 float kpx = 0.0;
 float kpy = 0.0;
 float kpz = 0.0;
-float kdx = 0.6;
-float kdy = 0.6;
-float kdz = 1.0;
+float kdx = 0.8;
+float kdy = 0.8;
+float kdz = 1.2;
 
 float kpx_dot = 0.0;
 float kpy_dot = 0.0;
