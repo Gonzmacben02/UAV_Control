@@ -133,6 +133,7 @@ int main(int argc, char** argv)
 
         //Publicar valores
         attitude_torq_pub.publish(attitude_torq_var);
+        error_ang_pub.publish(error_ang_var);
 
         ros::spinOnce();
         loop_rate.sleep();
