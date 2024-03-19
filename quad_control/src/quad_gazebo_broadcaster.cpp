@@ -32,8 +32,8 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 	ros::Rate loop_rate(100);
 	
-	ros::Subscriber pos = nh.subscribe("pos_var",100, &pos_callback);
-	ros::Subscriber att = nh.subscribe("ang_var",100, &att_callback);
+	ros::Subscriber pos = nh.subscribe("dynamics_pos",100, &pos_callback);
+	ros::Subscriber att = nh.subscribe("dynamics_ang",100, &att_callback);
 	
 	gazebo_msgs::ModelState states;
 	ros::Publisher gazebo_pub = nh.advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state",100);

@@ -14,11 +14,11 @@ float dpsi = 0;
 float x = -5;
 float y = 0;
 float z= 0;
-float psi = 0;
+float psi = (M_PI/2);
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "dif_robot");
+    ros::init(argc, argv, "reference");
     ros::NodeHandle nh;
     ros::Publisher ref_pos = nh.advertise<geometry_msgs::Vector3>("ref_pos", 100);
     ros::Publisher ref_vel = nh.advertise<geometry_msgs::Vector3>("vel_pos", 100);
@@ -37,17 +37,15 @@ int main(int argc, char **argv)
             dx = 0;
             dz = -0.5;
             dy = 0;
-            dpsi = 0;
+            dpsi = -0;
         }
-        if (t>=5 && t<= 65){
+        if (t>=5){ // Aqui se agrega el limite de 65s
             dx = 0.5*sin(0.1*(t-5));
             dy = 0.5*cos(0.1*(t-5));
             dz = 0;
-            dpsi = 0.1;
+            dpsi = -0.1;
         }
-        if (t>65){
-            n = 0;
-        }
+        
 
         x = x+ dx*0.01;
         y = y+ dy*0.01;

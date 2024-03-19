@@ -22,7 +22,7 @@ float y_dot = 0.0;
 float z_dot = 0.0;
 float m = 2;
 float g = 9.81;
-float th = 0.0;
+float th = -(m*g);
 float phi_roll = 0.0;
 float theta_pitch = 0.0;
 float psi_yaw = 0.0;
@@ -189,12 +189,17 @@ int main(int argc, char **argv)
         std::cout << "Roll deseado " << phi_roll_des << std::endl;
         std::cout << "Pitch deseado " << theta_pitch_des << std::endl;
         std::cout << "Uvz " << Uvz  << std::endl;
+        std::cout << "Uvx " << Uvx  << std::endl;
         std::cout << "xd " << x_des  << std::endl;
         std::cout << "yd " << y_des << std::endl;
         std::cout << "zd " << z_des  << std::endl;
         std::cout << "xdd " << x_dot_des  << std::endl;
         std::cout << "ydd " << y_dot_des  << std::endl;
         std::cout << "zdd " << z_dot_des  << std::endl;
+        std::cout << "kpz " << kpz  << std::endl;
+        std::cout << "ez " << ez  << std::endl;
+        std::cout << "kdz " << kdz  << std::endl;
+        std::cout << "ezdot " << ez_dot  << std::endl;
         std::cout << "Thrust " << th << "\n" << std::endl;
 
         ros::spinOnce();
