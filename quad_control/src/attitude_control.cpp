@@ -164,7 +164,7 @@ void ang_control_function()
 void tor_function()
 {
     tor_roll = Jxx*(((Jzz-Jyy)/Jxx)*(pitch_vel*yaw_vel)+u_roll);
-    tor_pitch = Jxx*(((Jzz-Jyy)/Jxx)*(roll_vel*yaw_vel)+u_pitch);
-    tor_yaw = Jxx*(((Jzz-Jyy)/Jxx)*(roll_vel*pitch_vel)+u_yaw);
+    tor_pitch = Jyy*(((Jxx-Jzz)/Jyy)*(roll_vel*yaw_vel)+u_pitch);
+    tor_yaw = Jzz*(((Jyy-Jxx)/Jzz)*(roll_vel*pitch_vel)+u_yaw);
 }
 

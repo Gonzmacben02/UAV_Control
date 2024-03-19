@@ -162,7 +162,7 @@ int main(int argc, char **argv)
         ex_dot = x_dot-x_dot_des;
         ey_dot = y_dot-y_dot_des;
         ez_dot = z_dot-z_dot_des;
-        Uvx = -kpx*ex-kdy*ex_dot;
+        Uvx = -kpx*ex-kdx*ex_dot;
         Uvy = -kpy*ey-kdy*ey_dot;
         Uvz = -(kpz*ez)-(kdz*ez_dot);
         th = (m/(cos(phi_roll)*cos(theta_pitch)))*(0-g+Uvz);
