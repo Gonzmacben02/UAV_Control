@@ -101,6 +101,7 @@ int main(int argc, char** argv)
     //ros::Publisher <$PUBLISHER_NAME> = nh.advertise<$TIPO_DE_MENSAJE>("<$TÓPICO>", 
     //<$NÚMERO_DE_DATOS_A_GUARDAR_EN_CASO_DE_TERMINAR_EL_NODO>)
     ros::Publisher attitude_torq_pub = nh.advertise<geometry_msgs::Vector3>("attitudeControl", 100);
+    ros::Publisher error_ang_pub = nh.advertise<geometry_msgs::Vector3>("error_ang", 100);
     ros::Subscriber pose_sub = nh.subscribe("posControl", 100, &posCallback);
     ros::Subscriber yaw_sub = nh.subscribe("yaw_pos", 100, &yawCallback);
     ros::Subscriber ang_sub = nh.subscribe("dynamics_ang", 100, &angCallback);
@@ -112,6 +113,7 @@ int main(int argc, char** argv)
     // Definición de las variables que identifican al mensaje de ROS
     //El mensaje Vector3 es un vector (3,1) que permite enviar varias variables en un mismo mensaje 
     geometry_msgs::Vector3 attitude_torq_var;
+    geometry_msgs::Vector3 error_ang_var;
     
     while(ros::ok())
     {
@@ -125,12 +127,15 @@ int main(int argc, char** argv)
         attitude_torq_var.y = tor_pitch;
         attitude_torq_var.z = tor_yaw;
 
+        error_ang_var.x = err_roll;
+        error_ang_var.x = err_pitch;
+        error_ang_var.x = err_yaw;
+
         //Publicar valores
         attitude_torq_pub.publish(attitude_torq_var);
 
         ros::spinOnce();
         loop_rate.sleep();
-         
     }
 
     return 0;
